@@ -1,3 +1,4 @@
+import { HtmlInputType } from './common/gridenums';
 import { Test } from './models/test';
 import { GridConfig } from './models/gridconfig';
 import { DataGrid } from './datagrid/datagrid';
@@ -17,14 +18,15 @@ export class Welcome {
   
   constructor(bindingEngine: BindingEngine) {
     for(let i=1; i<= 100; ++i) {
-      this.records.push({id: i, name: 'person' + i, surname: 'psurname ' + i, age: Math.ceil(Math.random() * 90)});
+      this.records.push({id: i, name: 'person' + i, surname: 'psurname ' + i, dob: '1980-08-10', age: Math.ceil(Math.random() * 90)});
     } 
 
     this.config.clear();
     this.config.addColumn('id', new ColumnConfig(false, 'Id', false, false, true));
     this.config.addColumn('name', new ColumnConfig(true, 'Name', false, true, true));
     this.config.addColumn('surname', new ColumnConfig(true, 'Surname', false, true, true));
-    this.config.addColumn('age', new ColumnConfig(true, 'Age', false, true, true));
+    this.config.addColumn('dob', new ColumnConfig(true, 'Dob', true, true, true, HtmlInputType.DATE));
+    this.config.addColumn('age', new ColumnConfig(true, 'Age', false, true, true, HtmlInputType.NUMBER));
   }
 
   // Getters can't be directly observed, so they must be dirty checked.

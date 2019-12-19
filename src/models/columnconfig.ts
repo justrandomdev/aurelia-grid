@@ -1,4 +1,4 @@
-import { SortOrder } from './../common/gridenums';
+import { SortOrder, HtmlInputType } from './../common/gridenums';
 import * as _ from 'lodash';
 
 export class ColumnConfig {
@@ -7,10 +7,11 @@ export class ColumnConfig {
   visible: boolean;
   editable: boolean;
   resizeable: boolean;
+  editor: HtmlInputType;
 
   order: SortOrder = SortOrder.NONE;
 
-  constructor(visible?: boolean, heading?: string, editable?: boolean, canOrder?: boolean, resizeable?: boolean) {
+  constructor(visible?: boolean, heading?: string, editable?: boolean, canOrder?: boolean, resizeable?: boolean, editor?: HtmlInputType) {
     this.heading = heading;
 
     if(!_.isNil(visible))
@@ -25,5 +26,6 @@ export class ColumnConfig {
     this.editable = editable || false;
     this.canOrder = canOrder || false;
     this.resizeable = resizeable || false;
+    this.editor = editor || HtmlInputType.NONE;
   }
 }

@@ -262,4 +262,21 @@ table th:hover {
 
 table td {
   position: relative;
+  padding-left: 2px;
+  padding-right:2px;
+  height: 29px;
+}
+
+table td span {
+  top:2px;
+  position: absolute;
+  display: block;
+  height: 27px;
+}
+
+table td input {
+  top:2px;
+  position: absolute;
+  width: calc(100% - 4px);
+  height: 25px;
 }
