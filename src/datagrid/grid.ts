@@ -1,10 +1,11 @@
+import { PageData } from './../models/pagedata';
 import { DataCell } from './../models/datacell';
 import { ColumnConfig } from 'models/columnconfig';
 import { DragHandleTracking } from './../models/draghandletracking';
 import { Util } from './../common/util';
 import { GridConfig } from '../models/gridconfig';
-import { DataGrid } from './datagrid';
-import { bindable, BindingEngine, autoinject } from 'aurelia-framework';
+import { DataSet } from './dataset';
+import { bindable, BindingEngine, autoinject, computedFrom } from 'aurelia-framework';
 import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons'
 import { SortOrder } from 'common/gridenums';
 import * as _ from 'lodash';
@@ -12,7 +13,8 @@ import * as _ from 'lodash';
 @autoinject
 export class Grid {
   //@bindable data: DataGrid<any, any>;
-  dataSet: DataGrid<any, any>;
+  @bindable
+  dataSet: DataSet<any, any>;
 
   @bindable 
   data: Array<any>;
@@ -24,6 +26,22 @@ export class Grid {
   cssClass: string;
 
   tracking: DragHandleTracking;
+
+  private _pageData: PageData;
+  get pageData(): PageData {
+    return this._pageData;
+  }
+
+  get footerColspan() {
+    return this.dataSet.visibleColumns - 1;
+  }
+
+  @computedFrom('pageData.selectedPage','pageData.recordsPerPage')
+  get pageRows():Map<any, any> {
+    const startIdx = this._pageData.selectedPage == 1 ? 0 : (this._pageData.selectedPage-1) * this._pageData.recordsPerPage;
+    const arr = Array.from(this.dataSet.rows).slice(startIdx, startIdx + this._pageData.recordsPerPage);
+    return new Map(arr);
+  }
 
   //icons
   upArrow = faArrowUp;
@@ -37,9 +55,12 @@ export class Grid {
   }
 
   bind() {
-    this.dataSet = new DataGrid<number, any>(this.bindingEngine);
+    this.dataSet = new DataSet<number, any>(this.bindingEngine);
     this.dataSet.config = this.config;
     this.dataSet.addRows(this.data);
+
+    this._pageData = new PageData(this.dataSet);
+    this._pageData.recordsPerPage = this.config.recordsPerPage;
   }
 
   dragHandleMouseDown(event: MouseEvent, index: number) {
@@ -101,10 +122,13 @@ export class Grid {
       else if(columnConfig.order === SortOrder.DESC) {
         this.resetColumnOrder(elem.fieldName);
 
-        columnConfig.order = SortOrder.NONE;
+        columnConfig.order = SortOrder.ASC;
+        this.data = _.orderBy(this.data, elem.fieldName, columnConfig.order as any);
         this.dataSet.rows.clear();
         this.dataSet.addRows(this.data);
       }
+
+      this._pageData.selectedPage = new Number(1) as number;
     }
   }
 
@@ -112,6 +136,24 @@ export class Grid {
     console.log(elem);
     const cell = elem.cell as DataCell<any>;
     cell.inEditMode = !cell.inEditMode;
+  }
+
+  firstPage() {
+    this.pageData.selectedPage = 1;
+  }
+
+  prevPage() {
+    if(this.pageData.selectedPage > 1)
+      this.pageData.selectedPage--;
+  }
+
+  nextPage() {
+    if(this.pageData.selectedPage < this.pageData.numPages)
+      this.pageData.selectedPage++;
+  }
+
+  lastPage() {
+    this.pageData.selectedPage = this.pageData.numPages;
   }
 
   private resetColumnOrder(fieldname: string) {

@@ -1,4 +1,6 @@
+import { bindable } from 'aurelia-framework';
 import { ColumnConfig } from './columnconfig';
+import * as _ from 'lodash';
 
 type fieldname = string;
 
@@ -16,13 +18,21 @@ export class GridConfig {
     return this._keyField;
   }
 
-  private _recordsPerPage: number;
-  set recordsPerPage(value: number) {
-    this._recordsPerPage = value;
+  private _showPager: boolean;
+  get showPager(): boolean {
+    return this._showPager;
   }
+  set showPager(value: boolean) {
+    this._showPager = value;
+  }
+
+  @bindable
+  recordsPerPage: number;
 
   constructor(keyField?: string, columns?: Array<ColumnConfig>) {
     this._keyField = keyField || "id";
+    this._showPager = false;
+    this.recordsPerPage = 10;
   }
 
   addColumn(field: fieldname, value: ColumnConfig) {

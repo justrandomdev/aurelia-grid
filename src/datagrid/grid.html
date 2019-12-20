@@ -13,7 +13,7 @@
       </tr>
     </thead>
     <tbody>
-      <tr repeat.for="[id, row] of dataSet.rows">
+      <tr if.bind="!config.showPager" repeat.for="[id, row] of dataSet.rows">
         <td repeat.for="[fieldname, cell] of row.fields" if.bind="row.config.columns.get(fieldname).visible"  contextmenu.delegate="cellRightClick($event, $this)">
             <span show.bind="!cell.inEditMode">${row.data[fieldname]}</span>
             <input type.bind="row.config.columns.get(fieldname).editor" show.bind="cell.inEditMode" value.bind="row.data[fieldname]">
@@ -21,13 +21,30 @@
                  show.bind="row.config.columns.get(fieldname).resizeable" 
                  mousedown.delegate="dragHandleMouseDown($event, $index)"></div>
         </td>
-      </tr>
+        <tr if.bind="config.showPager" repeat.for="[id, row] of pageRows">
+          <td repeat.for="[fieldname, cell] of row.fields" if.bind="row.config.columns.get(fieldname).visible"  contextmenu.delegate="cellRightClick($event, $this)">
+              <span show.bind="!cell.inEditMode">${row.data[fieldname]}</span>
+              <input type.bind="row.config.columns.get(fieldname).editor" show.bind="cell.inEditMode" value.bind="row.data[fieldname]">
+              <div class="dragHandle" 
+                   show.bind="row.config.columns.get(fieldname).resizeable" 
+                   mousedown.delegate="dragHandleMouseDown($event, $index)"></div>
+          </td>
+        </tr>
     </tbody>
-    <tfoot>
+    <tfoot if.bind="config.showPager">
       <tr>
-      <td colspan="4">
-      <div class="links"><a href="#">&laquo;</a> <a class="active" href="#">1</a> <a href="#">2</a> <a href="#">3</a> <a href="#">4</a> <a href="#">&raquo;</a></div>
-      </td>
+        <td colspan="1">
+          <input value.bind="pageData.recordsPerPage & debounce:500"></input>
+        </td>
+        <td colspan.bind="footerColspan">
+          <div class="links">
+            <a href="#" click.delegate="firstPage()" class.bind="pageData.isFirstPage ? 'disabled': ''">&laquo;&laquo;</a>
+            <a href="#" click.delegate="prevPage()" class.bind="!pageData.hasPreviousPage ? 'disabled': ''">&laquo;</a> 
+            <a class="pageNum">${pageData.selectedPage}</a class="pageNum">
+            <a href="#" click.delegate="nextPage()" class.bind="!pageData.hasNextPage ? 'disabled': ''">&raquo;</a>
+            <a href="#" click.delegate="lastPage()" class.bind="pageData.isLastPage ? 'disabled': ''"">&raquo;&raquo;</a>
+          </div>
+        </td>
       </tr>
     </tfoot>    
   </table>

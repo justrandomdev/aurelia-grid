@@ -1,14 +1,23 @@
-import { BindingEngine, autoinject, bindable } from 'aurelia-framework';
+import { ColumnConfig } from 'models/columnconfig';
+import { BindingEngine, autoinject, bindable, ICollectionObserverSplice } from 'aurelia-framework';
 import { GridConfig } from '../models/gridconfig';
 import { DataRow } from '../models/datarow';
 import * as _ from 'lodash';
 
+
+interface ColumnConfigChangedHandler {
+  (changedItems: Array<ICollectionObserverSplice<Map<string, ColumnConfig>>>): void;
+}
+
+
 @autoinject
-export class DataGrid<K, T> {
+export class DataSet<K, T> {
   private _rows: Map<K, DataRow<T>> = new Map();
   public get rows(): Map<K, DataRow<T>> {
     return this._rows;
   }
+
+  private _columnConfigSubscription;
 
   private _config: GridConfig;
   public get config(): GridConfig {
@@ -16,24 +25,42 @@ export class DataGrid<K, T> {
   }
   public set config(value: GridConfig) {
     this._config = value;
+
+    this._columnConfigSubscription = this._bindingEngine.collectionObserver(this._config.columns)
+      .subscribe(this.columnConfigChanged.bind(this));
   }
 
-  private _numRecords: number;
   get numRecords(): number {
-    return this._numRecords;
-  }
-
-  private _numPages: number;
-  get numPages(): number {
-    return Math.ceil(this._numRecords / this.config.recordsPerPage);
-  }
-
-  private _selectedPage: number;
-  get selectedPage(): number {
-    return this._selectedPage;
+    return this._rows.size;
   }
 
   private _numColumns: number;
+  get numColumns(): number {
+    return this._numColumns;
+  }
+
+  private _columnConfigchangedHandler: ColumnConfigChangedHandler;
+  set changedHandler(handler: ColumnConfigChangedHandler) {
+    this._columnConfigchangedHandler = handler;
+  }
+
+  private _visibleColumns: number;
+  get visibleColumns(): number {
+    if(!this._visibleColumns) {
+      let count = 0;
+
+      this._config.columns.forEach((v, k) => {
+        if(v.visible)
+          ++count;
+      });
+
+      this._visibleColumns = count;
+    }
+
+    return this._visibleColumns;
+  }
+
+
 
   constructor(private _bindingEngine: BindingEngine) {
   }
@@ -72,4 +99,11 @@ export class DataGrid<K, T> {
   clearRows() {
     this._rows.clear();
   }
+
+  columnConfigChanged(splices: Array<ICollectionObserverSplice<Map<string, ColumnConfig>>>) {
+    this._visibleColumns = undefined;
+    if(!_.isNil(this._columnConfigchangedHandler))
+      this._columnConfigchangedHandler(splices);
+  }
+
 }

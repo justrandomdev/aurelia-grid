@@ -223,6 +223,15 @@ table.blueTable tfoot {
 table.blueTable tfoot td {
   font-size: 14px;
 }
+
+table.blueTable tfoot input {
+  font-size: 14px;
+  color: #505050;
+  border: 3px solid  rgba(150, 217, 243, 0.5);
+  border-radius: 5px;
+  padding-left:2px;
+}
+
 table.blueTable tfoot .links {
   text-align: right;
 }
@@ -232,6 +241,13 @@ table.blueTable tfoot .links a{
   color: #FFFFFF;
   padding: 2px 8px;
   border-radius: 5px;
+}
+table.blueTable tfoot .links .disabled {
+  text-decoration:none;
+  background: rgb(133, 149, 160);
+}
+table.blueTable tfoot .links a.pageNum:hover{
+  text-decoration:none;
 }
 
 /*
