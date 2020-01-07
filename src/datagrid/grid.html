@@ -2,10 +2,22 @@
   <table class.bind="cssClass">
     <thead>
       <tr>
-        <th repeat.for="[fieldName, config] of dataSet.config.columns" if.bind="config.visible" click.delegate="columnHeaderClick($event, $this)">
-          <span>${config.heading}</span>
-          <font-awesome-icon if.bind="config.canOrder" show.bind="config.order === 'asc'" icon.bind="downArrow"></font-awesome-icon>
-          <font-awesome-icon if.bind="config.canOrder" show.bind="config.order === 'desc'" icon.bind="upArrow"></font-awesome-icon>
+        <th repeat.for="[fieldname, options] of columnOptions" if.bind="dataSet.config.columns.get(fieldname).visible" click.delegate="columnHeaderClick($event, $this)">
+          <span>${dataSet.config.columns.get(fieldname).heading}</span>
+          <font-awesome-icon if.bind="dataSet.config.columns.get(fieldname).canOrder" show.bind="options.sortOrder === 'asc'" icon.bind="downArrow"></font-awesome-icon>
+          <font-awesome-icon if.bind="dataSet.config.columns.get(fieldname).canOrder" show.bind="options.sortOrder === 'desc'" icon.bind="upArrow"></font-awesome-icon>
+          <div class="dragHandle" 
+               show.bind="config.resizeable" 
+               mousedown.delegate="dragHandleMouseDown($event, $index)"></div>
+        </th>
+      </tr>
+      <tr>
+        <th class="grid-filter" repeat.for="[fieldName, config] of dataSet.config.columns" if.bind="config.visible">
+          <div class="filter-container">
+            <font-awesome-icon class="icon" if.bind="config.canOrder" icon.bind="search"></font-awesome-icon>
+            <input type="search" keyup.delegate="filter($event, $this) & debounce:500" repeat.for="key, value of columnOptions" if.bind="key === fieldName" value.to-view="value.filterText">
+            
+          </div>
           <div class="dragHandle" 
                show.bind="config.resizeable" 
                mousedown.delegate="dragHandleMouseDown($event, $index)"></div>
@@ -16,7 +28,7 @@
       <tr if.bind="!config.showPager" repeat.for="[id, row] of dataSet.rows">
         <td repeat.for="[fieldname, cell] of row.fields" if.bind="row.config.columns.get(fieldname).visible"  contextmenu.delegate="cellRightClick($event, $this)">
             <span show.bind="!cell.inEditMode">${row.data[fieldname]}</span>
-            <input type.bind="row.config.columns.get(fieldname).editor" show.bind="cell.inEditMode" value.bind="row.data[fieldname]">
+            <input type.bind="row.config.columns.get(fieldname).editor" show.bind="cell.inEditMode" value.bind="row.data[fieldname]" change.delegate="cellChanged($event, $this)">
             <div class="dragHandle" 
                  show.bind="row.config.columns.get(fieldname).resizeable" 
                  mousedown.delegate="dragHandleMouseDown($event, $index)"></div>
@@ -24,7 +36,7 @@
         <tr if.bind="config.showPager" repeat.for="[id, row] of pageRows">
           <td repeat.for="[fieldname, cell] of row.fields" if.bind="row.config.columns.get(fieldname).visible"  contextmenu.delegate="cellRightClick($event, $this)">
               <span show.bind="!cell.inEditMode">${row.data[fieldname]}</span>
-              <input type.bind="row.config.columns.get(fieldname).editor" show.bind="cell.inEditMode" value.bind="row.data[fieldname]">
+              <input type.bind="row.config.columns.get(fieldname).editor" show.bind="cell.inEditMode" value.bind="row.data[fieldname]" change.delegate="cellChanged($event, $this, getRowKeyValue(row))">
               <div class="dragHandle" 
                    show.bind="row.config.columns.get(fieldname).resizeable" 
                    mousedown.delegate="dragHandleMouseDown($event, $index)"></div>

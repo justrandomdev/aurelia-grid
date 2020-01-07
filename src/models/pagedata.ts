@@ -10,7 +10,7 @@ export class PageData {
   }
 
   @bindable
-  recordsPerPage: number;
+  recordsPerPage: string;
 
   private _selectedPage: number;
 
@@ -47,7 +47,7 @@ export class PageData {
 
   @computedFrom('dataSet.numRecords','recordsPerPage')
   get numPages(): number {
-    return Math.ceil(this._dataSet.numRecords / this.recordsPerPage);
+    return Math.ceil(this._dataSet.numRecords / parseInt(this.recordsPerPage));
   }
 
   constructor(dataSet: DataSet<any, any>) {

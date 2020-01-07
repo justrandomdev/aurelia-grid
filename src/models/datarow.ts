@@ -54,5 +54,7 @@ export class DataRow<T> {
   rowChanged(splices: Array<ICollectionObserverSplice<Map<number, T>>>) {
     if(!_.isNil(this._changedHandler))
       this._changedHandler(splices);
+
+    console.log('Row changed');
   }
  }

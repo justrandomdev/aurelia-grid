@@ -9,8 +9,6 @@ export class ColumnConfig {
   resizeable: boolean;
   editor: HtmlInputType;
 
-  order: SortOrder = SortOrder.NONE;
-
   constructor(visible?: boolean, heading?: string, editable?: boolean, canOrder?: boolean, resizeable?: boolean, editor?: HtmlInputType) {
     this.heading = heading;
 

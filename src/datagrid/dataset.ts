@@ -63,6 +63,7 @@ export class DataSet<K, T> {
 
 
   constructor(private _bindingEngine: BindingEngine) {
+
   }
 
   addRows(records: Array<T>) {
@@ -81,6 +82,10 @@ export class DataSet<K, T> {
         //find id
         if(prop === this.config.keyField)
           id = el[prop];
+
+        //Add column filter
+        //if(!this._columnFilters.has(prop))
+        //  this._columnFilters.set(prop, "")
 
         row.addField(prop, fieldConfig.editable);
       }
@@ -106,4 +111,5 @@ export class DataSet<K, T> {
       this._columnConfigchangedHandler(splices);
   }
 
+  
 }
